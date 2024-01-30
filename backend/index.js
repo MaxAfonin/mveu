@@ -50,17 +50,6 @@ app.post('/login', async (req, res) => {
 
 app.get('/products', async (req, res) => {
 
-    /*const products = [
-        { id: 1, header: 'Товар 1', price: 120 },
-        { id: 2, header: 'Товар 2', price: 3423 },
-        { id: 3, header: 'Товар 3', price: 1223 },
-        { id: 4, header: 'Товар 4', price: 1250 },
-        { id: 5, header: 'Товар 5', price: 764 },
-        { id: 6, header: 'Товар 6', price: 2334 },
-        { id: 7, header: 'Товар 7', price: 764 },
-        { id: 8, header: 'Товар 8', price: 2334 },
-      ]*/
-
     const products = await Product.find()
 
     res.json({

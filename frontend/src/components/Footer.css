@@ -1,6 +1,11 @@
 .Footer {
     width: 100%;
-    height: 50px;
-    background-color: rgb(25, 25, 25);
-    color: #fff;
+    height: 30px;
+    background-color: #555555;
+    color: #FFF;
+    text-align: center;
+    line-height: 30px;
+    font-size: 12px;
+    text-align: left;
+    padding-left: 20px;
 }

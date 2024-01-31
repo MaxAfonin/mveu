@@ -1,24 +1,80 @@
 .Header {
     width: 100%;
-    height: 50px;
-    background-color: beige;
-    display: flex;
-    justify-content: flex-end; 
+    background-color: azure;
+    display: block;
+    padding: 0;
+    border-bottom: 1px solid #090;
 }
 
-.Header ul {
+.topbar {
+    width:100%;
+    height:45px;
+    background-color: black;
+    float: left;
+    display: flex;
+    border-top: 2px solid rgb(231, 159, 17) ;
+}
+
+.mainheader {
+    width: 100%;
+    height: 100px;
+    background-color: azure;
+    display: flex;
+    overflow: hidden;
+    border-bottom: 5px solid #e1d3b0;
+    float: left;
+    background-image: url(../img/background.png);
+}
+
+.logo {
+    width: 400px;
+    height: 150px;
     display: flex;
 }
 
 
-.Header li {
-    width: 140px;
-    height: 50px;
+.logo p {
+    display: flex;
+    font-weight: bold;
+    font-size: 28px;
+    margin: 0 20px;
+    line-height: 100px;
+}
+
+nav {
+    width: calc(100% - 400px);
+    text-align: right;
+}
+
+nav ul{
+    width: 100%;
+}
+
+nav li{
+    margin: 0 20px;
+    float: right;
     list-style: none;
-    line-height: 50px;
+    line-height: 100px;
     cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase;
 }
 
-.Header li:hover {
-    background-color: #FFF;
+nav li:hover{
+    text-decoration: underline;
+}
+
+@media (max-width: 426px) {
+
+    .Header ul,
+    .Header {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .Header {
+        height: 250px;
+    }
 }

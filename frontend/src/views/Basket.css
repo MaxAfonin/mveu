@@ -1,5 +1,47 @@
 .Basket {
     width: 100%;
-    height: calc(100vh - 50px - 50px);
-    background-color: #fff;
+    min-height: calc(100vh - 50px - 50px);
+    background-color: #f7f4ed;
+    padding-top: 30px;
+}
+
+.Basket h1 {
+    font-size: 32px;
+    line-height: 60px;
+    color: #674d0b;
+}
+
+.BasketContent {
+    padding: 30px;
+    row-gap: 30px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.Basket .order {
+    height: 50px;
+    width: 200px;
+    margin: 15px 0;
+    border-style: none;
+    background-color: #cdb885;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.Basket .order:hover {
+    background-color: #a78f53;
+}
+
+@media (max-width: 768px) {
+    .BasketContent {
+        min-height: calc(100vh - 160px - 50px);
+        padding: 10px;
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 426px) {
+    .BasketContent {
+        grid-template-columns: repeat(1, 1fr);
+    }
 }

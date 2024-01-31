@@ -1,31 +1,56 @@
 const PORT = 9001
-const URLDB = 'mongodb://localhost:27017'
+const URLDB = 'mongodb://127.0.0.1:27017/'
 
 const express = require('express')
 const cors = require('cors')
+const jsonwebtoken = require('jsonwebtoken')
 const mongoose = require('mongoose')
-const jwt = require('jsonwebtoken')
 const { secret } = require('./config')
 const User = require('./models/User')
 const Product = require('./models/Product')
 
 const app = express()
 
+const generateAccessToken = (id, login, email) => {
+    const payload = {
+        id, login, email
+    }
+
+    return jsonwebtoken.sign(payload, secret, { expiresIn: '24h' })
+}
+
 app.use(cors())
 app.use(express.json())
 
-const generateAccessToken = (id) => {
-    const payload = {
-        id
-    }
-    return jwt.sign(payload, secret, {expiresIn: '24h'})
-}
-
 app.post('/registration', async (req, res) => {
     console.log(req.body)
-    const {login, password, email} = req.body
-    const user = new User({login, password, email})
-    await user.save()
+    const { login, password, email } = req.body
+    const user = new User({ login, password, email })
+
+    try {
+        await user.save()
+    } catch (err) {
+        if (err && err.code !== 11000) {
+            res.json({
+                message: 'Неизвестная ошибка!'
+            })
+                .status(500)
+
+            return
+        }
+
+        //duplicate key
+        if (err && err.code === 11000) {
+            res.json({
+                message: 'Ошибка! Такой уже существует'
+            })
+                .status(400)
+            console.error('Ошибка! Такой уже существует')
+
+            return
+        }
+    }
+
     res.json({
         message: 'Вы успешно зарегистрировались!'
     })
@@ -33,24 +58,120 @@ app.post('/registration', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     console.log(req.body)
-    const {login, password} = req.body
-    const user = await User.findOne({login})
-    if (!user){
-        return res.status(400).json({message: 'Пользователь не найден!'})
+    const { login, password } = req.body
+    let user
+
+    try {
+        user = await User.findOne({ login })
+    } catch (err) {
+        res.json({
+            message: 'Неизвестная ошибка!'
+        })
+            .status(500)
+
+        return
     }
-    if (user.password !== password){
-        return res.status(400).json({message: 'Неверный логин или пароль!'})
+
+    if (!user) {
+        return res.status(400).json({ message: 'Пользователь не найден!' })
     }
-    const token = generateAccessToken(user._id)
+    if (user.password !== password) {
+        return res.status(400).json({ message: 'Неверный логин или пароль!' })
+    }
+    const jwtToken = generateAccessToken(user._id, user.login, user.email)
+
     res.json({
-        message: 'Вы успешно авторизованы!',
-        token: token
+        message: 'Вы успешно вошли на сайт',
+        token: jwtToken
+    })
+})
+
+app.post('/user/changePassword', async (req, res) => {
+    console.log(req.body)
+    const { token, password } = req.body
+    let user
+
+    try {
+        user = await User.findOneAndUpdate({ login: jsonwebtoken.verify(token, secret).login },
+            { password: password }, { returnOriginal: false })
+
+        if (user === null) {
+            res.json({
+                message: 'Пользователь не найден'
+            })
+                .status(400)
+        }
+    } catch (err) {
+        res.json({
+            message: 'Неизвестная ошибка!'
+        })
+            .status(500)
+
+        return
+    }
+
+    res.json({
+        message: 'Пароль успешно изменён',
+        newPassword: user.password
+    })
+})
+
+app.post('/user/changeEmail', async (req, res) => {
+    console.log(req.body)
+    const { token, email } = req.body
+    let user
+
+    try {
+        user = await User.findOneAndUpdate({ login: jsonwebtoken.verify(token, secret).login },
+            { email: email }, { returnOriginal: false })
+
+        if (user === null) {
+            res.json({
+                message: 'Пользователь не найден!'
+            })
+                .status(400)
+        }
+    } catch (err) {
+        if (err && err.code !== 11000) {
+            res.json({
+                message: 'Неизвестная ошибка!'
+            })
+                .status(500)
+
+            return
+        }
+
+        //duplicate key
+        if (err && err.code === 11000) {
+            res.json({
+                message: 'Ошибка! Такой уже существует'
+            })
+                .status(400)
+            console.error('Ошибка! Такой уже существует')
+
+            return
+        }
+    }
+
+    res.json({
+        message: 'E-Mail изменён! Для применения изменений заново авторизуйтесь!',
+        newEmail: user.email
     })
 })
 
 app.get('/products', async (req, res) => {
+    let products
 
-    const products = await Product.find()
+    try {
+        products = await Product.find()
+    } catch (err) {
+        res.json({
+            message: 'Неизвестная ошибка!'
+        })
+            .status(500)
+
+        return
+    }
 
     res.json({
         data: products
@@ -60,10 +181,33 @@ app.get('/products', async (req, res) => {
 const start = async () => {
     try {
         await mongoose.connect(URLDB)
-        app.listen(PORT, () => console.log(`Сервер запущен на ${PORT} порте`))
+        app.listen(PORT, () => console.log(`Сервер работает на порту ${PORT}`))
     } catch (e) {
-        console.log(e)
+        console.error(e)
     }
 }
+
+app.post('/products/add', async (req, res) => {
+    console.log(req.body)
+    const { title, price } = req.body
+    const product = new Product({ title, price })
+
+    try {
+        await product.save()
+    } catch (err) {
+        if (err && err.code !== 11000) {
+            res.json({
+                message: 'Неизвестная ошибка!'
+            })
+                .status(500)
+
+            return
+        }
+    }
+
+    res.json({
+        message: 'Товар добавлен. Обновите страницу.'
+    })
+})
 
 start()

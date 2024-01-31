@@ -1,11 +1,27 @@
 import React from 'react';
 import './Basket.css';
-import Product from '../components/Product';
+import ProductBasket from '../components/ProductBasket';
 
-function Basket() {
+function Basket({ basket, setBasket, basketPrice, setBasketPrice, basketQty, setBasketQty, setModalBox }) {
+  function ShowOrderButton() {
+    if (basketQty > 0) {
+      return (<><button className="order" onClick={() => setModalBox('OrderBox')}>Оформить заказ</button></>)
+    }
+  }
+
   return (
     <div className="Basket">
       <h1>Корзина</h1>
+      <div className="BasketContent">
+        {basket.map((item) => <ProductBasket key={item.id} id={item.id}
+          image={item.image} title={item.title}
+          price={item.price} setBasket={setBasket}
+          setBasketPrice={setBasketPrice}
+          setBasketQty={setBasketQty} />)}
+      </div>
+      <h2>Всего товаров: {basketQty}</h2>
+      <h2>На общую стоимость: {basketPrice} ₽</h2>
+      <ShowOrderButton />
     </div>
   );
 }

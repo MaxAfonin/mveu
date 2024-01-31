@@ -1,0 +1,40 @@
+.Cabinet {
+    width: 100%;
+    min-height: calc(100vh - 50px - 50px);
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3%;
+}
+
+.Cabinet h1 {
+    margin-bottom: 20px;
+}
+
+.Cabinet input {
+    height: 50px;
+    text-align: center;
+    width: 300px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.Cabinet p {
+    margin-bottom: 10px;
+}
+
+.Cabinet button {
+    height: 50px;
+    width: 300px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #cdb885;
+    border-style: none;
+}
+
+.Cabinet button:hover {
+    background-color: #a78f53;
+}
